@@ -61,11 +61,12 @@ class ServerlessPlugin {
   syncDirectory() {
     const s3Bucket = this.serverless.variables.service.custom.s3Bucket;
     const buildFolder = this.serverless.variables.service.custom.client.distributionFolder;
+    const region = this.serverless.variables.service.provider.region;
     const args = [
       's3',
       'sync',
       `${buildFolder}/`,
-      `s3://${s3Bucket}/`,
+      `s3://${s3Bucket}/${region}/`,
       '--delete',
     ];
     const { sterr } = this.runAwsCommand(args);
@@ -131,7 +132,7 @@ class ServerlessPlugin {
         '--distribution-id',
         distribution.Id,
         '--paths',
-        '"/*"',
+        '/*',
       ];
       const { sterr } = this.runAwsCommand(args);
       if (!sterr) {

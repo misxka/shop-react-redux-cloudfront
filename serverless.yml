@@ -11,19 +11,19 @@
 #
 # Happy Coding!
 
-service: misxka-task2
+service: misxka-task-2
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
-frameworkVersion: "2"
+frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs12.x
-  lambdaHashingVersion: 20201221
+  runtime: nodejs16.x
+  region: eu-west-1
 
 plugins:
   - serverless-finch
@@ -31,30 +31,28 @@ plugins:
 
 custom:
   client:
-    bucketName: misxka-task2-automated
+    bucketName: misxka-task-2-automated
     distributionFolder: build
-  ## Serverless-single-page-app-plugin configuration:
+
   s3LocalPath: ${self:custom.client.distributionFolder}/
   s3BucketName: ${self:custom.client.bucketName}
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+#  iam:
+#    role:
+#      statements:
+#        - Effect: "Allow"
+#          Action:
+#            - "s3:ListBucket"
+#          Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#        - Effect: "Allow"
+#          Action:
+#            - "s3:PutObject"
+#          Resource:
+#            Fn::Join:
+#              - ""
+#              - - "arn:aws:s3:::"
+#                - "Ref" : "ServerlessDeploymentBucket"
+#                - "/*"
 
 # you can define service wide environment variables here
 #  environment:
@@ -134,15 +132,15 @@ resources:
           Ref: WebAppS3Bucket
         PolicyDocument:
           Statement:
-            - Sid: "AllowCloudFrontAccessIdentity"
+            - Sid: 'AllowCloudFrontAccessIdentity'
               Effect: Allow
               Action: s3:GetObject
               Resource: arn:aws:s3:::${self:custom.s3BucketName}/*
               Principal:
                 AWS:
                   Fn::Join:
-                    - " "
-                    - - "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity"
+                    - ' '
+                    - - 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity'
                       - !Ref OriginAccessIdentity
 
     OriginAccessIdentity:
@@ -181,8 +179,8 @@ resources:
               ResponseCode: 200
               ResponsePagePath: /index.html
           DefaultCacheBehavior:
-            AllowedMethods: ["GET", "HEAD", "OPTIONS"]
-            CachedMethods: ["GET", "HEAD", "OPTIONS"]
+            AllowedMethods: ['GET', 'HEAD', 'OPTIONS']
+            CachedMethods: ['GET', 'HEAD', 'OPTIONS']
             ForwardedValues:
               Headers:
                 - Access-Control-Request-Headers
@@ -201,7 +199,7 @@ resources:
             DefaultTTL: 0
           ## The certificate to use when viewers use HTTPS to request objects.
           ViewerCertificate:
-            CloudFrontDefaultCertificate: "true"
+            CloudFrontDefaultCertificate: 'true'
           ## Uncomment the following section in case you want to enable logging for CloudFront requests
           # Logging:
           #   IncludeCookies: 'false'
@@ -212,7 +210,7 @@ resources:
   Outputs:
     WebAppS3BucketOutput:
       Value:
-        "Ref": WebAppS3Bucket
+        'Ref': WebAppS3Bucket
     WebAppCloudFrontDistributionOutput:
       Value:
-        "Fn::GetAtt": [WebAppCloudFrontDistribution, DomainName]
+        'Fn::GetAtt': [WebAppCloudFrontDistribution, DomainName]
