@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import React, { useEffect, useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Typography from "@material-ui/core/Typography";
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -18,6 +18,12 @@ export default function CSVFileImport({url, title}: CSVFileImportProps) {
   const classes = useStyles();
   const [file, setFile] = useState<any>();
 
+  useEffect(() => {
+    console.log(process.env.REACT_APP_USERNAME)
+    console.log(process.env.REACT_APP_PASSWORD)
+    localStorage.setItem('authorization_token', Buffer.from(`${process.env.REACT_APP_USERNAME}:${process.env.REACT_APP_PASSWORD}`).toString('base64'));
+  }, []);
+
   const onFileChange = (e: any) => {
     console.log(e);
     let files = e.target.files || e.dataTransfer.files
@@ -31,21 +37,29 @@ export default function CSVFileImport({url, title}: CSVFileImportProps) {
 
   const uploadFile = async (e: any) => {
       // Get the presigned URL
-      const response = await axios({
-        method: 'GET',
-        url,
-        params: {
-          name: encodeURIComponent(file.name)
-        }
-      })
-      console.log('File to upload: ', file.name)
-      console.log('Uploading to: ', response.data.signedUrl)
-      const result = await fetch(response.data.signedUrl, {
-        method: 'PUT',
-        body: file
-      })
-      console.log('Result: ', result)
-      setFile('');
+      try {
+        const response = await axios({
+          method: 'GET',
+          url,
+          headers: {
+            Authorization: `Basic ${localStorage.getItem('authorization_token')}`,
+          },
+          params: {
+            name: encodeURIComponent(file.name)
+          }
+        })
+        console.log('File to upload: ', file.name)
+        console.log('Uploading to: ', response.data.signedUrl)
+        const result = await fetch(response.data.signedUrl, {
+          method: 'PUT',
+          body: file
+        })
+        console.log('Result: ', result)
+        setFile('');
+      } catch (err) {
+        console.log(`Error code: ${(err as AxiosResponse).status}`);
+        console.log((err as AxiosResponse).data.message);
+      }
     }
   ;
 

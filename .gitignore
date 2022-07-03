@@ -30,3 +30,5 @@ jspm_packages
 
 # Serverless directories
 .serverless
+
+.env
