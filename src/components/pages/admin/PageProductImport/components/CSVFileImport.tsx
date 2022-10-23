@@ -19,8 +19,6 @@ export default function CSVFileImport({url, title}: CSVFileImportProps) {
   const [file, setFile] = useState<any>();
 
   useEffect(() => {
-    console.log(process.env.REACT_APP_USERNAME)
-    console.log(process.env.REACT_APP_PASSWORD)
     localStorage.setItem('authorization_token', Buffer.from(`${process.env.REACT_APP_USERNAME}:${process.env.REACT_APP_PASSWORD}`).toString('base64'));
   }, []);
 
